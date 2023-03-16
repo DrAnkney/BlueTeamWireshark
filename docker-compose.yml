@@ -1,0 +1,78 @@
+version: "3.6"
+############################################################
+## For testing, make sure no existing docker network collisions exist then:
+## docker-compose down && docker-compose up --remove-orphans --force-recreate --
+##renew-anon-volumes
+## This will remove all anonymous volumes (databases, etc.).
+############################################################
+services:
+  #  nessus:
+  #   container_name: nessus
+  #   image: tenableofficial/nessus
+  #   ports:
+  #          - 8834:8834
+  #   volumes:
+  #      - ./:/var/www/html
+  #   networks:
+  #     vuln-net:
+  #       ipv4_address: 192.168.13.20
+  container_1:
+    container_name: container_1
+    image: cyberxsecurity/tomcat-rce
+    ports:
+      - 10055:80
+    volumes:
+      - ./:/home
+    networks:
+      vuln-net:
+        ipv4_address: 192.168.13.10
+  container_2:
+    container_name: container_2
+    image: cyberxsecurity/vuln_container_2
+    ports:
+      - 10011:80
+    networks:
+      vuln-net:
+        ipv4_address: 192.168.13.11
+  container_3:
+    container_name: container_3
+    image: cyberxsecurity/vuln_container_3
+    ports:
+      - 10000:80
+    volumes:
+      - ./:/home
+    networks:
+      vuln-net:
+        ipv4_address: 192.168.13.12
+  container_4:
+    container_name: container_4
+    image: knqyf263/cve-2019-6340
+    ports:
+      - 10001:80
+    volumes:
+      - ./:/home
+    networks:
+      vuln-net:
+        ipv4_address: 192.168.13.13
+  container_5:
+    container_name: container_5
+    image: cyberxsecurity/sudo-vuln
+    privileged: true
+    expose:
+      - "22"
+    ports:
+      - 10007:80
+    volumes:
+      - ./:/home
+    networks:
+      vuln-net:
+        ipv4_address: 192.168.13.14
+############################################################
+networks:
+  vuln-net:
+    name: vuln-net
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.13.0/24"
+############################################################
